@@ -1,12 +1,11 @@
-### Machine learning operations
-1. 
+### Deploying ML models into Production
 
-2. Challenges Deploying ML models
-    - Data quality and consistency
-    - Scalability
-    - Model and data versioning and management
-    - Monitoring and perfomance
-    - Deployment env and infrastructure
-    - Interpretability and explainability
-    - Maintenance and updates
-    - Reproducibility
+
+1. Introduction
+    - Install Anaconda
+    - Install Docker, Docker compose
+2. Experiment Tracking and model management
+3. Orchestration and ML pipelines
+4. Model Deployment
+5. Model Moitoring
+6. Best practices
