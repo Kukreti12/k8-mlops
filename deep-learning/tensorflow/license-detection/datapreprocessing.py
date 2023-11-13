@@ -4,6 +4,7 @@ import pandas as pd
 import cv2
 import os
 import xml.etree.ElementTree as xet
+## Importing object detection models
 from tensorflow.keras.applications import MobileNetV2, InceptionV3, InceptionResNetV2
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
 from tensorflow.keras.models import Model
@@ -68,17 +69,14 @@ headmodel = Dense(250, activation="relu")(headmodel)
 headmodel = Dense(4, activation='sigmoid')(headmodel)
 
 # Final model
+#the Model class is used to instantiate a Keras model. It allows us to specify the inputs and outputs of the model, defining the computation graph that connects the inputs to the outputs.
 model = Model(inputs=inception_resnet.input, outputs=headmodel)
 
 # Compile model
 model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4))
 
 mlflow.set_tracking_uri("http://localhost:8080")
-# Log hyperparameters
-mlflow.log_param("batch_size", 10)
-mlflow.log_param("epochs", 10)
-mlflow.log_param("learning_rate", 1e-4)
-mlflow.end_run()
+
 # Log model architecture
 with mlflow.start_run() as run:
     # Log custom hyperparameters or parameters
@@ -87,11 +85,27 @@ with mlflow.start_run() as run:
     mlflow.log_param("output_activation", "sigmoid")
 
     # Model training
+    ## x_train: This is the training data, typically a NumPy array or a TensorFlow Dataset, containing the input features for the training set.
+
+    ## y_train: This is the target or label corresponding to each input in x_train. It represents the ground truth for the training set.
+
+    ## batch_size: The number of samples that will be used in each iteration (gradient update) during training. In this case, the model will be updated after processing every 10 samples.
+
+    ## epochs: An epoch is one complete pass through the entire training dataset. The model will be trained for 10 epochs, meaning it will see the entire training dataset 10 times.
+
+    ## validation_data: This parameter is used to provide a separate dataset (validation set) on which to evaluate the model's performance during training. It helps to monitor for overfitting and assess generalization.
+
+    ## callbacks: Callbacks are functions that can be applied at different stages of the training process. In this case, tfb (TensorBoard) is a callback used to log metrics and visualize the training process in TensorBoard.
+
+    ## TensorBoard (tfb): It's a visualization tool that comes with TensorFlow. By providing this callback, the training process will log metrics such as loss and any other metrics specified in the model compilation to a directory. TensorBoard can then be used to visualize these metrics over time, compare training and validation performance, and inspect the model graph.
     tfb = TensorBoard('object_detection')
     history = model.fit(x=x_train, y=y_train, batch_size=10, epochs=10,
                         validation_data=(x_test, y_test), callbacks=[tfb])
 
     # Log metrics
+    mlflow.log_param("batch_size", 10)
+    mlflow.log_param("epochs", 10)
+    mlflow.log_param("learning_rate", 1e-4)
     mlflow.log_metric("train_loss", history.history['loss'][-1])
     mlflow.log_metric("val_loss", history.history['val_loss'][-1])
 
