@@ -79,10 +79,11 @@ mlflow.set_tracking_uri("http://localhost:8080")
 
 # Log model architecture
 with mlflow.start_run() as run:
+    mlflow.tensorflow.autolog()
     # Log custom hyperparameters or parameters
-    mlflow.log_param("dense_units_1", 500)
-    mlflow.log_param("dense_units_2", 250)
-    mlflow.log_param("output_activation", "sigmoid")
+    # mlflow.log_param("dense_units_1", 500)
+    # mlflow.log_param("dense_units_2", 250)
+    # mlflow.log_param("output_activation", "sigmoid")
 
     # Model training
     ## x_train: This is the training data, typically a NumPy array or a TensorFlow Dataset, containing the input features for the training set.
@@ -99,15 +100,15 @@ with mlflow.start_run() as run:
 
     ## TensorBoard (tfb): It's a visualization tool that comes with TensorFlow. By providing this callback, the training process will log metrics such as loss and any other metrics specified in the model compilation to a directory. TensorBoard can then be used to visualize these metrics over time, compare training and validation performance, and inspect the model graph.
     tfb = TensorBoard('object_detection')
-    history = model.fit(x=x_train, y=y_train, batch_size=10, epochs=10,
+    history = model.fit(x=x_train, y=y_train, batch_size=10, epochs=100,
                         validation_data=(x_test, y_test), callbacks=[tfb])
-
+    
     # Log metrics
-    mlflow.log_param("batch_size", 10)
-    mlflow.log_param("epochs", 10)
-    mlflow.log_param("learning_rate", 1e-4)
-    mlflow.log_metric("train_loss", history.history['loss'][-1])
-    mlflow.log_metric("val_loss", history.history['val_loss'][-1])
+    # mlflow.log_param("batch_size", 10)
+    # mlflow.log_param("epochs", 10)
+    # mlflow.log_param("learning_rate", 1e-4)
+    # mlflow.log_metric("train_loss", history.history['loss'][-1])
+    # mlflow.log_metric("val_loss", history.history['val_loss'][-1])
 
     # Save model
     # model.save('./models/object_detection.h5')
